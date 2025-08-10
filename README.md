@@ -1,7 +1,7 @@
 # My makefile
 
 This the makefile that I use to build my C/C++ code.
-I accumulated this over a few years with the help of LLMs.
+I compiled this over a few years, with some help from LLMs.
 
 ## What it does
 
