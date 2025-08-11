@@ -22,7 +22,7 @@ SRC_DIR := ./src
 INC_DIR := ./include
 BIN_DIR := ./bin
 # store compiled object files
-OBJ_DIR := ./obj 
+OBJ_DIR := ./obj
 # holds static libraries
 LIB_DIR := ./lib
 RM := rm -f
