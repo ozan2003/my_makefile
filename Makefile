@@ -3,11 +3,13 @@ CC := gcc
 BUILD ?= debug
 
 WARNFLAGS := -Wall -Wextra -Wpedantic -Wshadow -Werror \
-	-pedantic-errors -Wlogical-op -Wcast-qual -Wstrict-aliasing -Wpointer-arith -Wcast-align -Wwrite-strings \
+	-pedantic-errors -Wlogical-op -Wcast-qual -Wstrict-aliasing -Wpointer-arith \
+	-Wcast-align -Wwrite-strings -Wdouble-promotion \
 	-Wswitch-default -Wunreachable-code -Wswitch-enum -Wformat=2 -Wunused-macros \
 	-Winit-self -Wundef -Wuninitialized -Wbad-function-cast -Wno-unused-parameter \
 	-Wredundant-decls -Wno-unused-result -Wduplicated-branches -Wduplicated-cond \
-	-Wno-missing-braces -Wmissing-include-dirs \
+	-Wno-missing-braces -Wmissing-include-dirs -Wconversion \
+    -Wno-unused-function -Wno-sign-conversion \
 	-Wmissing-format-attribute -Wmissing-noreturn -Wmissing-parameter-type
 
 ifeq ($(BUILD),debug)
