@@ -1,6 +1,7 @@
 CC := gcc
 
 BUILD ?= debug
+TARGET_EXEC ?= $(notdir $(CURDIR)).out
 
 WARNFLAGS := -Wall -Wextra -Wpedantic -Wshadow -Werror \
 	-pedantic-errors -Wlogical-op -Wcast-qual -Wstrict-aliasing -Wpointer-arith \
@@ -12,10 +13,12 @@ WARNFLAGS := -Wall -Wextra -Wpedantic -Wshadow -Werror \
     -Wno-unused-function -Wno-sign-conversion \
 	-Wmissing-format-attribute -Wmissing-noreturn -Wmissing-parameter-type
 
+# Compiler flags
 ifeq ($(BUILD),debug)
     CFLAGS := -fdiagnostics-color=always -O0 -g -std=c99 $(WARNFLAGS)
 else ifeq ($(BUILD),release)
-    CFLAGS := -fdiagnostics-color=always -O2 -std=c99 $(WARNFLAGS)
+    CFLAGS := -fdiagnostics-color=always -O2 -DNDEBUG -std=c99 $(WARNFLAGS)
+	CFLAGS += -fstack-protector-strong -D_FORTIFY_SOURCE=3
 else
     $(error BUILD must be either 'debug' or 'release')
 endif
@@ -28,28 +31,32 @@ OBJ_DIR := ./obj
 # holds static libraries
 LIB_DIR := ./lib
 RM := rm -f
-TARGET_EXEC := main.out
 
 SOURCES := $(shell find $(SRC_DIR) -name '*.c')
 OBJECTS := $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SOURCES))
 DEPFILES := $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.d,$(SOURCES))
 
 INC_PARAMS := $(addprefix -I,$(shell find $(INC_DIR) -type d))
+# C preprocessor flags
+CPPFLAGS := $(INC_PARAMS)
 
 # Automatically detect static libraries and convert to linker flags
 LIBRARIES := $(wildcard $(LIB_DIR)/lib*.a)
 LIB_FLAGS := $(patsubst $(LIB_DIR)/lib%.a,-l%,$(LIBRARIES))
-LIBS := -L$(LIB_DIR) $(LIB_FLAGS)
+# Linker flags
+LDFLAGS := -L$(LIB_DIR)
+# The libraries to link with
+LDLIBS := -Wl,--start-group $(LIB_FLAGS) -Wl,--end-group
 
 -include $(DEPFILES)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	@mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) $(INC_PARAMS) -MMD -MP -MF $(OBJ_DIR)/$*.d -c $< -o $@
+	$(CC) $(CPPFLAGS) $(CFLAGS) -MMD -MP -MF $(OBJ_DIR)/$*.d -c $< -o $@
 
 $(BIN_DIR)/$(TARGET_EXEC): $(OBJECTS)
 	@mkdir -p $(BIN_DIR)
-	$(CC) $(CFLAGS) $^ $(LIBS) -o $@
+	$(CC) $^ $(LDFLAGS) $(LDLIBS) -o $@
 
 .PHONY: all
 all: $(BIN_DIR)/$(TARGET_EXEC)
