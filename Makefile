@@ -11,7 +11,9 @@ WARNFLAGS := -Wall -Wextra -Wpedantic -Wshadow -Werror \
 	-Wredundant-decls -Wno-unused-result -Wduplicated-branches -Wduplicated-cond \
 	-Wno-missing-braces -Wmissing-include-dirs -Wconversion \
     -Wno-unused-function -Wno-sign-conversion \
-	-Wmissing-format-attribute -Wmissing-noreturn -Wmissing-parameter-type
+	-Wmissing-format-attribute -Wmissing-noreturn -Wmissing-parameter-type \
+	-Wstrict-prototypes -Wold-style-definition -Wvla -Wnull-dereference \
+	-Wimplicit-fallthrough=5
 
 # Compiler flags
 ifeq ($(BUILD),debug)
