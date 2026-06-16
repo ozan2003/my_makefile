@@ -3,26 +3,51 @@ CC := gcc
 BUILD ?= debug
 TARGET_EXEC ?= $(notdir $(CURDIR)).out
 
-WARNFLAGS := -Wall -Wextra -Wpedantic -Wshadow -Werror \
-	-pedantic-errors -Wlogical-op -Wcast-qual -Wstrict-aliasing -Wpointer-arith \
-	-Wcast-align -Wwrite-strings -Wdouble-promotion \
-	-Wswitch-default -Wunreachable-code -Wswitch-enum -Wformat=2 -Wunused-macros \
-	-Winit-self -Wundef -Wuninitialized -Wbad-function-cast -Wno-unused-parameter \
-	-Wredundant-decls -Wno-unused-result -Wduplicated-branches -Wduplicated-cond \
-	-Wno-missing-braces -Wmissing-include-dirs -Wconversion \
-    -Wno-unused-function -Wno-sign-conversion \
-	-Wmissing-format-attribute -Wmissing-noreturn -Wmissing-parameter-type \
-	-Wstrict-prototypes -Wold-style-definition -Wvla -Wnull-dereference \
-	-Wimplicit-fallthrough=5
-
 # Compiler flags
+WARNFLAGS := \
+	-Wall -Wextra -Wpedantic -Werror -pedantic-errors \
+	-Wshadow \
+	-Wconversion -Wsign-conversion \
+	-Wcast-qual -Wcast-align \
+	-Wpointer-arith \
+	-Wwrite-strings \
+	-Wdouble-promotion \
+	-Wstrict-prototypes \
+	-Wold-style-definition \
+	-Wswitch-enum -Wswitch-default \
+	-Wformat=2 -Wformat-truncation=2 \
+	-Wundef \
+	-Wbad-function-cast \
+	-Wredundant-decls \
+	-Wvla \
+	-Wimplicit-fallthrough=5 \
+	-Wduplicated-cond \
+	-Wduplicated-branches \
+	-Wnull-dereference \
+	-fno-common
+
+DEBUGFLAGS := \
+	-O1 \
+	-g3 \
+	-fno-omit-frame-pointer
+
+# Sanitizer flags
+SANITIZEFLAGS := -fsanitize=address,undefined
+
+# Linker flags
+LDFLAGS := -L$(LIB_DIR)
+# The libraries to link with
+LDLIBS := 
+
 ifeq ($(BUILD),debug)
-    CFLAGS := -fdiagnostics-color=always -O0 -g -std=c99 $(WARNFLAGS)
+	CFLAGS := -fdiagnostics-color=always -O0 -g -std=c99 $(WARNFLAGS) $(DEBUGFLAGS) $(SANITIZEFLAGS)
+	# Add sanitizer flags to the linker libraries
+	LDLIBS += $(SANITIZEFLAGS)
 else ifeq ($(BUILD),release)
-    CFLAGS := -fdiagnostics-color=always -O2 -DNDEBUG -std=c99 $(WARNFLAGS)
+	CFLAGS := -fdiagnostics-color=always -O2 -DNDEBUG -std=c99 $(WARNFLAGS)
 	CFLAGS += -fstack-protector-strong -D_FORTIFY_SOURCE=3
 else
-    $(error BUILD must be either 'debug' or 'release')
+	$(error BUILD must be either 'debug' or 'release')
 endif
 
 SRC_DIR := ./src
@@ -45,10 +70,12 @@ CPPFLAGS := $(INC_PARAMS)
 # Automatically detect static libraries and convert to linker flags
 LIBRARIES := $(wildcard $(LIB_DIR)/lib*.a)
 LIB_FLAGS := $(patsubst $(LIB_DIR)/lib%.a,-l%,$(LIBRARIES))
-# Linker flags
-LDFLAGS := -L$(LIB_DIR)
 # The libraries to link with
-LDLIBS := -Wl,--start-group $(LIB_FLAGS) -Wl,--end-group
+LDLIBS += -Wl,--start-group $(LIB_FLAGS) -Wl,--end-group
+
+# Ensure the object directory exists before trying to include dependency files
+$(OBJ_DIR):
+	mkdir -p $(OBJ_DIR)
 
 -include $(DEPFILES)
 
@@ -56,9 +83,9 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	@mkdir -p $(dir $@)
 	$(CC) $(CPPFLAGS) $(CFLAGS) -MMD -MP -MF $(OBJ_DIR)/$*.d -c $< -o $@
 
-$(BIN_DIR)/$(TARGET_EXEC): $(OBJECTS)
+$(BIN_DIR)/$(TARGET_EXEC): $(OBJECTS) | $(OBJ_DIR)
 	@mkdir -p $(BIN_DIR)
-	$(CC) $^ $(LDFLAGS) $(LDLIBS) -o $@
+	$(CC) $^ $(LDFLAGS) $(LDLIBS) $(SANITIZEFLAGS) -o $@
 
 .PHONY: all
 all: $(BIN_DIR)/$(TARGET_EXEC)
