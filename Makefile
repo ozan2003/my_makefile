@@ -26,8 +26,7 @@ WARNFLAGS := \
 	-Wnull-dereference \
 	-fno-common
 
-DEBUGFLAGS := \
-	-O1 \
+DEBUGFLAGS := -O0 \
 	-g3 \
 	-fno-omit-frame-pointer
 
@@ -40,7 +39,7 @@ LDFLAGS := -L$(LIB_DIR)
 LDLIBS := 
 
 ifeq ($(BUILD),debug)
-	CFLAGS := -fdiagnostics-color=always -O0 -g -std=c99 $(WARNFLAGS) $(DEBUGFLAGS) $(SANITIZEFLAGS)
+	CFLAGS := -fdiagnostics-color=always -std=c99 $(WARNFLAGS) $(DEBUGFLAGS) $(SANITIZEFLAGS)
 	# Add sanitizer flags to the linker libraries
 	LDLIBS += $(SANITIZEFLAGS)
 else ifeq ($(BUILD),release)
