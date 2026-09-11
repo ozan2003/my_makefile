@@ -4,29 +4,6 @@ BUILD ?= debug
 TARGET_EXEC ?= $(notdir $(CURDIR)).out
 CXXSTD ?= c++23
 
-WARNFLAGS := -Wall -Wextra -Wpedantic -Wshadow -Werror \
-	-pedantic-errors -Wlogical-op -Wcast-qual -Wstrict-aliasing -Wpointer-arith \
-	-Wcast-align -Wdouble-promotion -Wsuggest-override \
-	-Wswitch-default -Wswitch-enum -Wformat=2 -Wunused-macros \
-	-Wundef -Wuninitialized -Wno-unused-parameter \
-	-Wredundant-decls -Wno-unused-result -Wduplicated-branches -Wduplicated-cond \
-	-Wno-missing-braces -Wmissing-include-dirs -Wconversion \
-    -Wno-unused-function -Wno-sign-conversion -Wextra-semi \
-	-Wmissing-format-attribute -Wmissing-noreturn \
-	-Wnull-dereference -Wimplicit-fallthrough=5 -Wold-style-cast \
-	-Woverloaded-virtual -Wnon-virtual-dtor \
-	-Wuseless-cast -Wzero-as-null-pointer-constant
-
-# Compiler flags
-ifeq ($(BUILD),debug)
-    CXXFLAGS := -fdiagnostics-color=always -O0 -g -std=$(CXXSTD) $(WARNFLAGS)
-else ifeq ($(BUILD),release)
-    CXXFLAGS := -fdiagnostics-color=always -O2 -DNDEBUG -std=$(CXXSTD) $(WARNFLAGS)
-	CXXFLAGS += -fstack-protector-strong -D_FORTIFY_SOURCE=3
-else
-    $(error BUILD must be either 'debug' or 'release')
-endif
-
 SRC_DIR := ./src
 INC_DIR := ./include
 BIN_DIR := ./bin
@@ -35,6 +12,42 @@ OBJ_DIR := ./obj
 # holds static libraries
 LIB_DIR := ./lib
 RM := rm -f
+
+WARNFLAGS := -Wall -Wextra -Wpedantic -Wshadow -Werror \
+	-pedantic-errors -Wlogical-op -Wcast-qual -Wstrict-aliasing -Wpointer-arith \
+	-Wcast-align -Wdouble-promotion -Wsuggest-override \
+	-Wswitch-default -Wswitch-enum -Wformat=2 -Wformat-truncation=2 -Wunused-macros \
+	-Wundef -Wuninitialized \
+	-Wredundant-decls -Wduplicated-branches -Wduplicated-cond \
+	-Wmissing-include-dirs -Wconversion -Wsign-conversion -Wextra-semi \
+	-Wmissing-format-attribute -Wmissing-noreturn \
+	-Wnull-dereference -Wimplicit-fallthrough=5 -Wvla -Wold-style-cast \
+	-Woverloaded-virtual -Wnon-virtual-dtor \
+	-Wuseless-cast -Wzero-as-null-pointer-constant
+
+# Compiler flags
+DEBUGFLAGS := -O0 \
+	-g3 \
+	-fno-omit-frame-pointer
+
+# Sanitizer flags
+SANITIZEFLAGS := -fsanitize=address,undefined
+
+# Linker flags
+LDFLAGS := -L$(LIB_DIR)
+# The libraries to link with
+LDLIBS :=
+
+ifeq ($(BUILD),debug)
+	CXXFLAGS := -fdiagnostics-color=always -std=$(CXXSTD) $(WARNFLAGS) $(DEBUGFLAGS) $(SANITIZEFLAGS)
+	# Add sanitizer flags to the linker libraries
+	LDLIBS += $(SANITIZEFLAGS)
+else ifeq ($(BUILD),release)
+	CXXFLAGS := -fdiagnostics-color=always -O2 -DNDEBUG -std=$(CXXSTD) $(WARNFLAGS)
+	CXXFLAGS += -fstack-protector-strong -D_FORTIFY_SOURCE=3
+else
+	$(error BUILD must be either 'debug' or 'release')
+endif
 
 SOURCES := $(shell find $(SRC_DIR) \( -name '*.cpp' -o -name '*.cc' -o -name '*.cxx' \) -type f)
 OBJECTS := $(patsubst $(SRC_DIR)/%,$(OBJ_DIR)/%.o,$(basename $(SOURCES)))
@@ -47,10 +60,9 @@ CPPFLAGS := $(INC_PARAMS)
 # Automatically detect static libraries and convert to linker flags
 LIBRARIES := $(wildcard $(LIB_DIR)/lib*.a)
 LIB_FLAGS := $(patsubst $(LIB_DIR)/lib%.a,-l%,$(LIBRARIES))
-# Linker flags
-LDFLAGS := -L$(LIB_DIR)
-# The libraries to link with
-LDLIBS := -Wl,--start-group $(LIB_FLAGS) -Wl,--end-group
+LDLIBS += -Wl,--start-group $(LIB_FLAGS) -Wl,--end-group
+
+.DEFAULT_GOAL := all
 
 -include $(DEPFILES)
 
@@ -88,7 +100,9 @@ distclean:
 	$(RM) -r $(OBJ_DIR) $(BIN_DIR)
 
 .PHONY: rebuild
-rebuild: clean all
+rebuild:
+	$(MAKE) clean
+	$(MAKE) all
 
 .PHONY: help
 help:
