@@ -17,14 +17,15 @@ WARNFLAGS := \
 	-Wall -Wextra -Wpedantic -Werror -pedantic-errors \
 	-Wshadow \
 	-Wconversion -Wsign-conversion \
-	-Wcast-qual -Wcast-align \
+	-Wcast-qual -Wcast-align=strict \
 	-Wpointer-arith \
 	-Wwrite-strings \
 	-Wdouble-promotion \
 	-Wstrict-prototypes \
 	-Wold-style-definition \
 	-Wswitch-enum -Wswitch-default \
-	-Wformat=2 -Wformat-truncation=2 \
+	-Wformat=2 -Wformat-truncation=2 -Wformat-overflow=2 \
+	-Wformat-signedness -Wformat-nonliteral \
 	-Wundef \
 	-Wbad-function-cast \
 	-Wredundant-decls \
@@ -33,11 +34,35 @@ WARNFLAGS := \
 	-Wduplicated-cond \
 	-Wduplicated-branches \
 	-Wnull-dereference \
+	-Wlogical-op \
+	-Wjump-misses-init \
+	-Wmissing-prototypes \
+	-Wmissing-declarations \
+	-Wnested-externs \
+	-Wfloat-equal \
+	-Walloc-zero \
+	-Walloca \
+	-Wmissing-include-dirs \
+	-Wunused-macros \
+	-Winit-self \
+	-Wunsuffixed-float-constants \
+	-Warith-conversion \
+	-Warray-bounds=2 \
+	-Wstringop-overflow=4 \
+	-Wuse-after-free=3 \
+	-Wattribute-alias=2 \
+	-Wstrict-aliasing=3 \
+	-Wflex-array-member-not-at-end \
+	-Wtrampolines \
+	-Wbidi-chars=any \
+	-Wstack-protector \
+	-fstrict-flex-arrays=3 \
 	-fno-common
 
 DEBUGFLAGS := -O0 \
 	-g3 \
-	-fno-omit-frame-pointer
+	-fno-omit-frame-pointer \
+	-fanalyzer
 
 # Sanitizer flags
 SANITIZEFLAGS := -fsanitize=address,undefined
