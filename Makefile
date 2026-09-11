@@ -14,21 +14,40 @@ LIB_DIR := ./lib
 RM := rm -f
 
 WARNFLAGS := -Wall -Wextra -Wpedantic -Wshadow -Werror \
-	-pedantic-errors -Wlogical-op -Wcast-qual -Wstrict-aliasing -Wpointer-arith \
-	-Wcast-align -Wdouble-promotion -Wsuggest-override \
-	-Wswitch-default -Wswitch-enum -Wformat=2 -Wformat-truncation=2 -Wunused-macros \
+	-pedantic-errors -Wlogical-op -Wcast-qual -Wstrict-aliasing=3 -Wpointer-arith \
+	-Wcast-align=strict -Wdouble-promotion -Wsuggest-override \
+	-Wswitch-default -Wswitch-enum \
+	-Wformat=2 -Wformat-truncation=2 -Wformat-overflow=2 \
+	-Wformat-signedness -Wformat-nonliteral \
+	-Wunused-macros \
 	-Wundef -Wuninitialized \
 	-Wredundant-decls -Wduplicated-branches -Wduplicated-cond \
 	-Wmissing-include-dirs -Wconversion -Wsign-conversion -Wextra-semi \
 	-Wmissing-format-attribute -Wmissing-noreturn \
 	-Wnull-dereference -Wimplicit-fallthrough=5 -Wvla -Wold-style-cast \
 	-Woverloaded-virtual -Wnon-virtual-dtor \
-	-Wuseless-cast -Wzero-as-null-pointer-constant
+	-Wuseless-cast -Wzero-as-null-pointer-constant \
+	-Wmissing-declarations \
+	-Wfloat-equal \
+	-Walloc-zero \
+	-Walloca \
+	-Wwrite-strings \
+	-Winit-self \
+	-Warith-conversion \
+	-Warray-bounds=2 \
+	-Wstringop-overflow=4 \
+	-Wuse-after-free=3 \
+	-Wattribute-alias=2 \
+	-Wflex-array-member-not-at-end \
+	-Wtrampolines \
+	-Wbidi-chars=any \
+	-Wstack-protector
 
 # Compiler flags
 DEBUGFLAGS := -O0 \
 	-g3 \
-	-fno-omit-frame-pointer
+	-fno-omit-frame-pointer \
+	-fanalyzer
 
 # Sanitizer flags
 SANITIZEFLAGS := -fsanitize=address,undefined
