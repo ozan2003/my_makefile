@@ -3,6 +3,15 @@ CC := gcc
 BUILD ?= debug
 TARGET_EXEC ?= $(notdir $(CURDIR)).out
 
+SRC_DIR := ./src
+INC_DIR := ./include
+BIN_DIR := ./bin
+# store compiled object files
+OBJ_DIR := ./obj
+# holds static libraries
+LIB_DIR := ./lib
+RM := rm -f
+
 # Compiler flags
 WARNFLAGS := \
 	-Wall -Wextra -Wpedantic -Werror -pedantic-errors \
@@ -36,7 +45,7 @@ SANITIZEFLAGS := -fsanitize=address,undefined
 # Linker flags
 LDFLAGS := -L$(LIB_DIR)
 # The libraries to link with
-LDLIBS := 
+LDLIBS :=
 
 ifeq ($(BUILD),debug)
 	CFLAGS := -fdiagnostics-color=always -std=c99 $(WARNFLAGS) $(DEBUGFLAGS) $(SANITIZEFLAGS)
@@ -48,15 +57,6 @@ else ifeq ($(BUILD),release)
 else
 	$(error BUILD must be either 'debug' or 'release')
 endif
-
-SRC_DIR := ./src
-INC_DIR := ./include
-BIN_DIR := ./bin
-# store compiled object files
-OBJ_DIR := ./obj
-# holds static libraries
-LIB_DIR := ./lib
-RM := rm -f
 
 SOURCES := $(shell find $(SRC_DIR) -name '*.c')
 OBJECTS := $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SOURCES))
@@ -72,6 +72,8 @@ LIB_FLAGS := $(patsubst $(LIB_DIR)/lib%.a,-l%,$(LIBRARIES))
 # The libraries to link with
 LDLIBS += -Wl,--start-group $(LIB_FLAGS) -Wl,--end-group
 
+.DEFAULT_GOAL := all
+
 # Ensure the object directory exists before trying to include dependency files
 $(OBJ_DIR):
 	mkdir -p $(OBJ_DIR)
@@ -84,7 +86,7 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 
 $(BIN_DIR)/$(TARGET_EXEC): $(OBJECTS) | $(OBJ_DIR)
 	@mkdir -p $(BIN_DIR)
-	$(CC) $^ $(LDFLAGS) $(LDLIBS) $(SANITIZEFLAGS) -o $@
+	$(CC) $^ $(LDFLAGS) $(LDLIBS) -o $@
 
 .PHONY: all
 all: $(BIN_DIR)/$(TARGET_EXEC)
@@ -104,7 +106,9 @@ distclean:
 	$(RM) -r $(OBJ_DIR) $(BIN_DIR)
 
 .PHONY: rebuild
-rebuild: clean all
+rebuild:
+	$(MAKE) clean
+	$(MAKE) all
 
 .PHONY: help
 help:
