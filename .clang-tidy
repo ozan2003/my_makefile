@@ -7,6 +7,12 @@
 # never reaches the parser and every project header fails to resolve. The
 # `compile_flags.txt` beside this file supplies them.
 #
+# Aim is Rust-like signal: correctness and bug-catching first, style second.
+# `modernize-*` is deliberately not enabled. `hicpp-*` is skipped because it
+# aliases checks already enabled below. Library- and project-specific families
+# (abseil, boost, google, llvm, fuchsia, android, zircon, llvmlibc,
+# linuxkernel, altera, objc, darwin) are skipped.
+#
 # C++-only checks and naming rules live on the cxx_make branch.
 
 Checks: >
@@ -17,14 +23,25 @@ Checks: >
   cert-*,
   concurrency-*,
   portability-*,
+  readability-avoid-nested-conditional-operator,
+  readability-avoid-return-with-void-value,
+  readability-avoid-unconditional-preprocessor-if,
   readability-braces-around-statements,
   readability-duplicate-include,
+  readability-enum-initial-value,
   readability-identifier-naming,
   readability-inconsistent-declaration-parameter-name,
+  readability-math-missing-parentheses,
   readability-misleading-indentation,
+  readability-misplaced-array-index,
   readability-named-parameter,
+  readability-non-const-parameter,
+  readability-redundant-casting,
+  readability-redundant-control-flow,
   readability-redundant-declaration,
+  readability-redundant-function-ptr-dereference,
   readability-simplify-boolean-expr,
+  readability-suspicious-call-argument,
   -bugprone-easily-swappable-parameters,
   -bugprone-implicit-widening-of-multiplication-result,
   -clang-analyzer-security.insecureAPI.*,
@@ -46,8 +63,10 @@ SystemHeaders: false
 CheckOptions:
   - { key: readability-identifier-naming.StructCase,           value: CamelCase }
   - { key: readability-identifier-naming.EnumCase,             value: CamelCase }
+  - { key: readability-identifier-naming.EnumConstantCase,     value: UPPER_CASE }
   - { key: readability-identifier-naming.FunctionCase,         value: lower_case }
   - { key: readability-identifier-naming.VariableCase,         value: lower_case }
+  - { key: readability-identifier-naming.ParameterCase,        value: lower_case }
   # C struct members. C++ class members use Public/Private/ProtectedMemberCase,
   # which live on the cxx_make branch.
   - { key: readability-identifier-naming.MemberCase,           value: lower_case }

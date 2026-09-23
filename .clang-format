@@ -8,6 +8,7 @@
 # NamespaceIndentation, constructor initializers, template declarations, ...)
 # live on the cxx_make branch.
 
+# --- shared with cxx_make - keep this block identical on both branches ------
 BasedOnStyle: Microsoft
 BreakBeforeBraces: Allman
 IndentWidth: 4
@@ -42,3 +43,13 @@ SpaceAfterCStyleCast: false
 SpaceAfterLogicalNot: false
 SpaceBeforeAssignmentOperators: true
 SpaceBeforeParens: ControlStatements
+InsertNewlineAtEOF: true
+IndentPPDirectives: AfterHash
+SeparateDefinitionBlocks: Always
+IncludeBlocks: Regroup
+BreakAfterAttributes: Always
+RemoveParentheses: ReturnStatement
+# clang-format documents QualifierAlignment != Leave as capable of producing
+# incorrect formatting, because it lacks full semantic information. Review the
+# first `make format` diff before trusting it.
+QualifierAlignment: Right
