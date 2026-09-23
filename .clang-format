@@ -1,0 +1,44 @@
+# .clang-format - C style (master branch).
+#
+# NOTE: deliberately no `Language:` key. A `Language:` key in the FIRST document
+# makes clang-format reject this whole file for every other language, e.g. a .c
+# file then fails with "Configuration file(s) do(es) not support C".
+#
+# This branch is C. C++-only options (Standard, AccessModifierOffset,
+# NamespaceIndentation, constructor initializers, template declarations, ...)
+# live on the cxx_make branch.
+
+BasedOnStyle: Microsoft
+BreakBeforeBraces: Allman
+IndentWidth: 4
+TabWidth: 4
+ColumnLimit: 120
+UseTab: Never
+IndentCaseLabels: true
+PointerAlignment: Left
+BreakBeforeTernaryOperators: false
+AlignAfterOpenBracket: Align
+AlignOperands: Align
+AlignConsecutiveMacros: Consecutive
+AlignConsecutiveAssignments:
+  Enabled: true
+AlignConsecutiveDeclarations:
+  Enabled: true
+AlignTrailingComments:
+  Kind: Always
+BinPackArguments: false
+BinPackParameters: OnePerLine
+AllowAllArgumentsOnNextLine: false
+AllowAllParametersOfDeclarationOnNextLine: false
+AllowShortFunctionsOnASingleLine: None
+AllowShortBlocksOnASingleLine: Never
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: false
+AlwaysBreakBeforeMultilineStrings: false
+ReflowComments: true
+SortIncludes: CaseSensitive
+SpaceAfterCStyleCast: false
+SpaceAfterLogicalNot: false
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeParens: ControlStatements

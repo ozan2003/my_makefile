@@ -1,0 +1,55 @@
+---
+# .clang-tidy - linter for C (master branch).
+#
+# clang-tidy needs a compile database. `CompileFlags.Add` here is NOT a
+# substitute: without one clang-tidy warns "Error while trying to load a
+# compilation database" and then lints with no flags at all, so `-Iinclude`
+# never reaches the parser and every project header fails to resolve. The
+# `compile_flags.txt` beside this file supplies them.
+#
+# C++-only checks and naming rules live on the cxx_make branch.
+
+Checks: >
+  bugprone-*,
+  clang-analyzer-*,
+  performance-*,
+  misc-*,
+  cert-*,
+  concurrency-*,
+  portability-*,
+  readability-braces-around-statements,
+  readability-duplicate-include,
+  readability-identifier-naming,
+  readability-inconsistent-declaration-parameter-name,
+  readability-misleading-indentation,
+  readability-named-parameter,
+  readability-redundant-declaration,
+  readability-simplify-boolean-expr,
+  -bugprone-easily-swappable-parameters,
+  -bugprone-implicit-widening-of-multiplication-result,
+  -clang-analyzer-security.insecureAPI.*,
+  -misc-include-cleaner,
+  -misc-no-recursion,
+  -portability-avoid-pragma-once,
+
+# Report only. The compiler already gates the build on -Werror; set to '*' to
+# make clang-tidy fatal too.
+WarningsAsErrors: ''
+HeaderFilterRegex: '.*'
+# Make `clang-tidy --fix` follow .clang-format.
+FormatStyle: file
+UseColor: true
+SystemHeaders: false
+
+# Naming rules. clang-tidy silently ignores unknown keys here, so every key
+# below was checked against the clang-tidy 20 docs and verified to fire.
+CheckOptions:
+  - { key: readability-identifier-naming.StructCase,           value: CamelCase }
+  - { key: readability-identifier-naming.EnumCase,             value: CamelCase }
+  - { key: readability-identifier-naming.FunctionCase,         value: lower_case }
+  - { key: readability-identifier-naming.VariableCase,         value: lower_case }
+  # C struct members. C++ class members use Public/Private/ProtectedMemberCase,
+  # which live on the cxx_make branch.
+  - { key: readability-identifier-naming.MemberCase,           value: lower_case }
+  # MacroCase is not a real option; definitions use MacroDefinitionCase.
+  - { key: readability-identifier-naming.MacroDefinitionCase,  value: UPPER_CASE }
