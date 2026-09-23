@@ -3,11 +3,12 @@
 # NOTE: deliberately no `Language:` key. A `Language:` key in the FIRST document
 # makes clang-format reject this whole file for every other language.
 #
-# The "shared" block is duplicated verbatim on master by design - the two
+# The "shared" block below is byte-identical to master's by design - the two
 # branches carry separate copies, so a change to a shared option must be made on
-# both.
+# both. A CI-free check: extract from the "# --- shared" marker to EOF and diff
+# the two branches.
 
-# --- shared with master (C) ------------------------------------------------
+# --- shared with cxx_make - keep this block identical on both branches ------
 BasedOnStyle: Microsoft
 BreakBeforeBraces: Allman
 IndentWidth: 4
@@ -42,6 +43,16 @@ SpaceAfterCStyleCast: false
 SpaceAfterLogicalNot: false
 SpaceBeforeAssignmentOperators: true
 SpaceBeforeParens: ControlStatements
+InsertNewlineAtEOF: true
+IndentPPDirectives: AfterHash
+SeparateDefinitionBlocks: Always
+IncludeBlocks: Regroup
+BreakAfterAttributes: Always
+RemoveParentheses: ReturnStatement
+# clang-format documents QualifierAlignment != Leave as capable of producing
+# incorrect formatting, because it lacks full semantic information. Review the
+# first `make format` diff before trusting it.
+QualifierAlignment: Right
 
 # --- C++ only --------------------------------------------------------------
 # clang-format 20 has no c++23/c++26 value (only c++03..c++20, Latest, Auto).
@@ -59,3 +70,4 @@ CompactNamespaces: false
 FixNamespaceComments: true
 AllowShortLambdasOnASingleLine: Empty
 BreakBeforeConceptDeclarations: Always
+EmptyLineAfterAccessModifier: Always
