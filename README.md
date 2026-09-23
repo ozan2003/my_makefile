@@ -17,6 +17,8 @@ I compiled this over a few years, with some help from LLMs.
 - Links object and library files into executable files.
 - Supports debug and release build modes.
 - Runs the executable file.
+- Formats C++ sources and headers with `clang-format`.
+- Lints C++ sources and headers with `clang-tidy`.
 
 ## How to use
 
@@ -27,5 +29,17 @@ I compiled this over a few years, with some help from LLMs.
 - Run `make clean` to clean up the object files and executable files.
 - Run `make BUILD=release` to build optimized version.
 - Run `make distclean` to remove all generated files and directories.
+- Run `make format` to format your code in place.
+- Run `make tidy` to lint your code.
 
 Refer to `make help` to see all the commands.
+
+## Config files
+
+- `.clang-format`: the C++ style. `clang-tidy --fix` follows it too.
+- `.clang-tidy`: linter checks and identifier naming rules.
+- `compile_flags.txt`: the compiler flags clang-tidy and clangd parse with.
+  Without it they run with no flags and cannot resolve headers in `include`.
+
+The Makefile builds `-std=c++23`. clang-format 20 has no `c++23` value, so
+`.clang-format` uses `Standard: Latest`.
