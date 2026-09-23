@@ -1,0 +1,61 @@
+# .clang-format - C++ style (cxx_make branch).
+#
+# NOTE: deliberately no `Language:` key. A `Language:` key in the FIRST document
+# makes clang-format reject this whole file for every other language.
+#
+# The "shared" block is duplicated verbatim on master by design - the two
+# branches carry separate copies, so a change to a shared option must be made on
+# both.
+
+# --- shared with master (C) ------------------------------------------------
+BasedOnStyle: Microsoft
+BreakBeforeBraces: Allman
+IndentWidth: 4
+TabWidth: 4
+ColumnLimit: 120
+UseTab: Never
+IndentCaseLabels: true
+PointerAlignment: Left
+BreakBeforeTernaryOperators: false
+AlignAfterOpenBracket: Align
+AlignOperands: Align
+AlignConsecutiveMacros: Consecutive
+AlignConsecutiveAssignments:
+  Enabled: true
+AlignConsecutiveDeclarations:
+  Enabled: true
+AlignTrailingComments:
+  Kind: Always
+BinPackArguments: false
+BinPackParameters: OnePerLine
+AllowAllArgumentsOnNextLine: false
+AllowAllParametersOfDeclarationOnNextLine: false
+AllowShortFunctionsOnASingleLine: None
+AllowShortBlocksOnASingleLine: Never
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: false
+AlwaysBreakBeforeMultilineStrings: false
+ReflowComments: true
+SortIncludes: CaseSensitive
+SpaceAfterCStyleCast: false
+SpaceAfterLogicalNot: false
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeParens: ControlStatements
+
+# --- C++ only --------------------------------------------------------------
+# clang-format 20 has no c++23/c++26 value (only c++03..c++20, Latest, Auto).
+# The Makefile builds -std=c++23, so track the newest parser available.
+Standard: Latest
+AccessModifierOffset: -4
+NamespaceIndentation: All
+BreakTemplateDeclarations: Yes
+BreakConstructorInitializers: BeforeColon
+PackConstructorInitializers: NextLineOnly
+SortUsingDeclarations: LexicographicNumeric
+SpaceAfterTemplateKeyword: true
+SpacesInAngles: false
+CompactNamespaces: false
+FixNamespaceComments: true
+AllowShortLambdasOnASingleLine: Empty
+BreakBeforeConceptDeclarations: Always

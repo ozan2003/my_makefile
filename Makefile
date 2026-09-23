@@ -12,6 +12,8 @@ OBJ_DIR := ./obj
 # holds static libraries
 LIB_DIR := ./lib
 RM := rm -f
+CLANG_FORMAT ?= clang-format
+CLANG_TIDY ?= clang-tidy
 
 WARNFLAGS := -Wall -Wextra -Wpedantic -Wshadow -Werror \
 	-pedantic-errors -Wlogical-op -Wcast-qual -Wstrict-aliasing=3 -Wpointer-arith \
@@ -72,6 +74,9 @@ SOURCES := $(shell find $(SRC_DIR) \( -name '*.cpp' -o -name '*.cc' -o -name '*.
 OBJECTS := $(patsubst $(SRC_DIR)/%,$(OBJ_DIR)/%.o,$(basename $(SOURCES)))
 DEPFILES := $(OBJECTS:.o=.d)
 
+# Sources and headers that clang-format/clang-tidy operate on
+CLANG_FILES := $(shell find $(SRC_DIR) $(INC_DIR) \( -name '*.cpp' -o -name '*.cc' -o -name '*.cxx' -o -name '*.h' -o -name '*.hpp' -o -name '*.hh' -o -name '*.hxx' \) -type f 2>/dev/null)
+
 INC_PARAMS := $(addprefix -I,$(shell find $(INC_DIR) -type d))
 # Preprocessor flags
 CPPFLAGS := $(INC_PARAMS)
@@ -123,14 +128,28 @@ rebuild:
 	$(MAKE) clean
 	$(MAKE) all
 
+.PHONY: format
+format:
+	@command -v $(CLANG_FORMAT) >/dev/null 2>&1 || { echo "$(CLANG_FORMAT) not found"; exit 1; }
+	@[ -n "$(CLANG_FILES)" ] || { echo "no C++ sources or headers found in $(SRC_DIR) or $(INC_DIR)"; exit 1; }
+	$(CLANG_FORMAT) -i $(CLANG_FILES)
+
+.PHONY: tidy
+tidy:
+	@command -v $(CLANG_TIDY) >/dev/null 2>&1 || { echo "$(CLANG_TIDY) not found"; exit 1; }
+	@[ -n "$(CLANG_FILES)" ] || { echo "no C++ sources or headers found in $(SRC_DIR) or $(INC_DIR)"; exit 1; }
+	$(CLANG_TIDY) $(CLANG_FILES)
+
 .PHONY: help
 help:
-	@echo "\033[1;34mUsage: make [all|run|clean|distclean|rebuild|help] [BUILD=debug|release] [CXXSTD=c++23]\033[0m"
+	@echo "\033[1;34mUsage: make [all|run|clean|distclean|rebuild|format|tidy|help] [BUILD=debug|release] [CXXSTD=c++23]\033[0m"
 	@echo "  \033[1;32mall\033[0m:       Compile the project"
 	@echo "  \033[1;32mrun\033[0m:       Compile and run the project"
 	@echo "  \033[1;32mclean\033[0m:     Remove compiled files"
 	@echo "  \033[1;32mdistclean\033[0m: Remove compiled files and directories"
 	@echo "  \033[1;32mrebuild\033[0m:   Clean and recompile the project"
+	@echo "  \033[1;32mformat\033[0m:    Format sources and headers with clang-format"
+	@echo "  \033[1;32mtidy\033[0m:      Lint sources and headers with clang-tidy"
 	@echo "  \033[1;32mhelp\033[0m:      Display this help message"
 	@echo "  \033[1;32mBUILD\033[0m:     Set to debug (default) or release"
 	@echo "  \033[1;32mCXXSTD\033[0m:    Set C++ standard (default: C++23)"
