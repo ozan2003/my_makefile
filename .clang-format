@@ -13,7 +13,8 @@ BasedOnStyle: Microsoft
 BreakBeforeBraces: Allman
 IndentWidth: 4
 TabWidth: 4
-ColumnLimit: 120
+# Embedded C is 80 columns: fits a serial console and side-by-side diffs.
+ColumnLimit: 80
 UseTab: Never
 IndentCaseLabels: true
 PointerAlignment: Left
@@ -52,4 +53,15 @@ RemoveParentheses: ReturnStatement
 # clang-format documents QualifierAlignment != Leave as capable of producing
 # incorrect formatting, because it lacks full semantic information. Review the
 # first `make format` diff before trusting it.
-QualifierAlignment: Right
+# Left gives west const (`const char *name`), which is what the ESP8266 SDK and
+# essentially every embedded C codebase uses. The preset default is Leave.
+QualifierAlignment: Left
+
+# --- embedded / ESP8266 ----------------------------------------------------
+# The default for AlignEscapedNewlines is Right, which pads every macro's
+# trailing backslash out to ColumnLimit. Embedded code is mostly macros.
+AlignEscapedNewlines: Left
+# Register maps, pin tables, command tables.
+AlignArrayOfStructures: Right
+# Register bitfield definitions.
+AlignConsecutiveBitFields: Consecutive
